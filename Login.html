@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #000A1F;
+      --navy-mid:#0a1f4d;
+      --sky-deep:#1a3a7a;
+      --sky-mid: #1e6abf;
+      --sky-lite: #5ba3e8;
+      --sky-pale: #a8d4f5;
+      --white:   #ffffff;
+      --offwhite: #f0f6ff;
+      --glass-bg: rgba(255,255,255,0.12);
+      --glass-border: rgba(255,255,255,0.28);
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(160deg, #000A1F 0%, #0a2060 30%, #1a5faa 65%, #5ba3e8 88%, #a8d4f5 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated sky clouds */
+    .sky-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .cloud {
+      position: absolute;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.07);
+      filter: blur(18px);
+      animation: drift linear infinite;
+    }
+    .cloud:nth-child(1)  { width:320px; height:70px;  top:12%; left:-10%; animation-duration:38s; }
+    .cloud:nth-child(2)  { width:200px; height:50px;  top:28%; left:60%;  animation-duration:52s; animation-delay:-12s; }
+    .cloud:nth-child(3)  { width:260px; height:60px;  top:55%; left:20%;  animation-duration:44s; animation-delay:-7s; }
+    .cloud:nth-child(4)  { width:180px; height:45px;  top:70%; left:75%;  animation-duration:60s; animation-delay:-25s; }
+    .cloud:nth-child(5)  { width:350px; height:80px;  top:82%; left:-5%;  animation-duration:50s; animation-delay:-18s; }
+    @keyframes drift { from { transform: translateX(0); } to { transform: translateX(110vw); } }
+
+    /* Stars */
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity:0.15; transform:scale(1); }
+      50%      { opacity:0.9;  transform:scale(1.4); }
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      margin: 24px 16px;
+      padding: 44px 40px 36px;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 20px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 8px 48px rgba(0,10,31,0.55), inset 0 1px 0 rgba(255,255,255,0.2);
+      color: var(--white);
+      text-align: center;
+    }
+
+    .logo-ring {
+      width: 62px; height: 62px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--sky-mid), var(--sky-lite));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 6px rgba(91,163,232,0.18);
+    }
+    .logo-ring svg { width:28px; height:28px; fill:white; }
+
+    .card h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .card .subtitle {
+      font-size: 0.875rem;
+      color: var(--sky-pale);
+      margin-bottom: 28px;
+      font-weight: 400;
+    }
+
+    .field {
+      position: relative;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--sky-pale);
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      background: rgba(0,10,31,0.45);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      color: var(--white);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.35); }
+    .field input:focus {
+      border-color: var(--sky-lite);
+      box-shadow: 0 0 0 3px rgba(91,163,232,0.22);
+    }
+    .field .icon {
+      position: absolute;
+      left: 13px;
+      bottom: 13px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .field .icon svg { width:18px; height:18px; fill:none; stroke:white; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: linear-gradient(135deg, #ffffff 0%, #c8e6ff 100%);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 18px rgba(255,255,255,0.18);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(168,212,245,0.4);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .divider {
+      margin: 22px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.78rem;
+    }
+    .divider::before, .divider::after {
+      content:''; flex:1;
+      height:1px;
+      background: rgba(255,255,255,0.15);
+    }
+
+    .card p {
+      margin-top: 18px;
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.6);
+    }
+    .card p a {
+      color: var(--sky-pale);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .card p a:hover { color: var(--white); text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="sky-layer">
+    <div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
+    <div class="cloud"></div><div class="cloud"></div>
+  </div>
+
+  <div class="stars" id="stars"></div>
+
+  <div class="card">
+    <div class="logo-ring">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to your account to continue</p>
+
+    <form>
+      <div class="field">
+        <label>Username</label>
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        <input type="text" placeholder="Enter your username" required>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <input type="password" placeholder="Enter your password" required>
+      </div>
+
+      <a href="index.html"><button class="btn-primary" type="submit">Sign In</button></a>
+    </form>
+
+    <p>New here? <a href="Create.html">Create an account</a></p>
+  </div>
+
+  <script>
+    // Generate stars
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = Math.random() * 2.2 + 0.8;
+      s.style.cssText = `
+        width:${size}px; height:${size}px;
+        top:${Math.random()*60}%;
+        left:${Math.random()*100}%;
+        animation-duration:${2.5+Math.random()*4}s;
+        animation-delay:${-Math.random()*6}s;
+      `;
+      starsEl.appendChild(s);
+    }
+  </script>
+</body>
+</html>

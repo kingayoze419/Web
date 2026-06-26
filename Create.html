@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #000A1F;
+      --navy-mid:   #0a1f4d;
+      --sky-deep:   #1a3a7a;
+      --sky-mid:    #1e6abf;
+      --sky-lite:   #5ba3e8;
+      --sky-pale:   #a8d4f5;
+      --white:      #ffffff;
+      --glass-bg:   rgba(255,255,255,0.11);
+      --glass-border: rgba(255,255,255,0.26);
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(160deg, #000A1F 0%, #0a2060 30%, #1a5faa 65%, #5ba3e8 88%, #a8d4f5 100%);
+      position: relative;
+      overflow-x: hidden;
+      padding: 40px 16px;
+    }
+
+    .sky-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .cloud {
+      position: absolute;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.07);
+      filter: blur(18px);
+      animation: drift linear infinite;
+    }
+    .cloud:nth-child(1)  { width:320px; height:70px;  top:8%;  left:-10%; animation-duration:38s; }
+    .cloud:nth-child(2)  { width:200px; height:50px;  top:22%; left:60%;  animation-duration:52s; animation-delay:-12s; }
+    .cloud:nth-child(3)  { width:260px; height:60px;  top:48%; left:15%;  animation-duration:44s; animation-delay:-7s; }
+    .cloud:nth-child(4)  { width:180px; height:45px;  top:65%; left:70%;  animation-duration:60s; animation-delay:-25s; }
+    .cloud:nth-child(5)  { width:350px; height:80px;  top:80%; left:-5%;  animation-duration:50s; animation-delay:-18s; }
+    @keyframes drift { from { transform: translateX(0); } to { transform: translateX(110vw); } }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity:0.15; transform:scale(1); }
+      50%      { opacity:0.9;  transform:scale(1.4); }
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      padding: 44px 40px 40px;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 20px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 8px 48px rgba(0,10,31,0.55), inset 0 1px 0 rgba(255,255,255,0.18);
+      color: var(--white);
+      text-align: center;
+    }
+
+    .logo-ring {
+      width: 62px; height: 62px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--sky-mid), var(--sky-lite));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 6px rgba(91,163,232,0.18);
+    }
+    .logo-ring svg { width:28px; height:28px; fill:none; stroke:white; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+    .card h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .card .subtitle {
+      font-size: 0.875rem;
+      color: var(--sky-pale);
+      margin-bottom: 28px;
+    }
+
+    /* Two-column grid for name fields */
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      position: relative;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .field label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--sky-pale);
+      margin-bottom: 5px;
+    }
+    .field input {
+      width: 100%;
+      padding: 11px 13px 11px 40px;
+      background: rgba(0,10,31,0.45);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      color: var(--white);
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.32); }
+    .field input:focus {
+      border-color: var(--sky-lite);
+      box-shadow: 0 0 0 3px rgba(91,163,232,0.2);
+    }
+    .field .icon {
+      position: absolute;
+      left: 12px;
+      bottom: 11px;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+    .field .icon svg { width:17px; height:17px; fill:none; stroke:white; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+    /* Select / dropdown fields */
+    .select-field {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .select-field label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--sky-pale);
+      margin-bottom: 5px;
+    }
+
+    /* Native gender select */
+    .select-field select.native-select {
+      width: 100%;
+      padding: 11px 13px;
+      background: rgba(0,10,31,0.45);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      color: var(--white);
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235ba3e8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+    .select-field select.native-select option {
+      background: #0a2060;
+      color: white;
+    }
+    .select-field select.native-select:focus {
+      border-color: var(--sky-lite);
+      box-shadow: 0 0 0 3px rgba(91,163,232,0.2);
+    }
+
+    /* Select2 overrides */
+    .select2-container--default .select2-selection--single {
+      background: rgba(0,10,31,0.45) !important;
+      border: 1.5px solid rgba(255,255,255,0.18) !important;
+      border-radius: 10px !important;
+      height: 42px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      color: white !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 0.92rem !important;
+      padding-left: 13px !important;
+      line-height: 42px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+      color: rgba(255,255,255,0.35) !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 42px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+      border-color: var(--sky-lite) transparent transparent !important;
+    }
+    .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+      border-color: transparent transparent var(--sky-lite) !important;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--single {
+      border-color: var(--sky-lite) !important;
+      box-shadow: 0 0 0 3px rgba(91,163,232,0.2) !important;
+    }
+    .select2-dropdown {
+      background: #0a2060 !important;
+      border: 1.5px solid rgba(91,163,232,0.4) !important;
+      border-radius: 10px !important;
+    }
+    .select2-container--default .select2-results__option {
+      color: white !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 0.9rem !important;
+      padding: 8px 12px !important;
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+      background: rgba(91,163,232,0.25) !important;
+    }
+    .select2-search--dropdown .select2-search__field {
+      background: rgba(0,10,31,0.6) !important;
+      border: 1px solid rgba(255,255,255,0.2) !important;
+      border-radius: 6px !important;
+      color: white !important;
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: linear-gradient(135deg, #ffffff 0%, #c8e6ff 100%);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 18px rgba(255,255,255,0.18);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(168,212,245,0.4);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .card p {
+      margin-top: 20px;
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.6);
+    }
+    .card p a {
+      color: var(--sky-pale);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .card p a:hover { color: var(--white); text-decoration: underline; }
+
+    @media (max-width: 520px) {
+      .card { padding: 32px 22px 28px; }
+      .row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sky-layer">
+    <div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
+    <div class="cloud"></div><div class="cloud"></div>
+  </div>
+  <div class="stars" id="stars"></div>
+
+  <div class="card">
+    <div class="logo-ring">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+    <h2>Create Account</h2>
+    <p class="subtitle">Join us — fill in your details below</p>
+
+    <form>
+      <!-- Name row -->
+      <div class="row-2">
+        <div class="field">
+          <label>First Name</label>
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <input type="text" placeholder="First name" required>
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <input type="text" placeholder="Last name" required>
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div class="field">
+        <label>Username</label>
+        <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></span>
+        <input type="text" placeholder="Choose a username" required>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label>Email</label>
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+        <input type="email" placeholder="Your email address" required>
+      </div>
+
+      <!-- Telephone -->
+      <div class="field">
+        <label>Telephone</label>
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <input type="tel" placeholder="Phone number" required>
+      </div>
+
+      <!-- Password row -->
+      <div class="row-2">
+        <div class="field">
+          <label>Password</label>
+          <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="field">
+          <label>Confirm Password</label>
+          <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <input type="password" placeholder="Confirm" required>
+        </div>
+      </div>
+
+      <!-- Nationality -->
+      <div class="select-field">
+        <label>Nationality</label>
+        <select id="nationality" style="width:100%">
+          <option value="">Select your nationality…</option>
+          <option value="Afghanistan">🇦🇫 Afghanistan</option>
+          <option value="Albania">🇦🇱 Albania</option>
+          <option value="Algeria">🇩🇿 Algeria</option>
+          <option value="Andorra">🇦🇩 Andorra</option>
+          <option value="Angola">🇦🇴 Angola</option>
+          <option value="Argentina">🇦🇷 Argentina</option>
+          <option value="Armenia">🇦🇲 Armenia</option>
+          <option value="Australia">🇦🇺 Australia</option>
+          <option value="Austria">🇦🇹 Austria</option>
+          <option value="Azerbaijan">🇦🇿 Azerbaijan</option>
+          <option value="Bahamas">🇧🇸 Bahamas</option>
+          <option value="Bahrain">🇧🇭 Bahrain</option>
+          <option value="Bangladesh">🇧🇩 Bangladesh</option>
+          <option value="Barbados">🇧🇧 Barbados</option>
+          <option value="Belgium">🇧🇪 Belgium</option>
+          <option value="Belize">🇧🇿 Belize</option>
+          <option value="Benin">🇧🇯 Benin</option>
+          <option value="Bhutan">🇧🇹 Bhutan</option>
+          <option value="Bolivia">🇧🇴 Bolivia</option>
+          <option value="Bosnia and Herzegovina">🇧🇦 Bosnia and Herzegovina</option>
+          <option value="Botswana">🇧🇼 Botswana</option>
+          <option value="Brazil">🇧🇷 Brazil</option>
+          <option value="Brunei">🇧🇳 Brunei</option>
+          <option value="Bulgaria">🇧🇬 Bulgaria</option>
+          <option value="Burkina Faso">🇧🇫 Burkina Faso</option>
+          <option value="Burundi">🇧🇮 Burundi</option>
+          <option value="Cambodia">🇰🇭 Cambodia</option>
+          <option value="Cameroon">🇨🇲 Cameroon</option>
+          <option value="Canada">🇨🇦 Canada</option>
+          <option value="Chile">🇨🇱 Chile</option>
+          <option value="China">🇨🇳 China</option>
+          <option value="Colombia">🇨🇴 Colombia</option>
+          <option value="Congo">🇨🇬 Congo</option>
+          <option value="Costa Rica">🇨🇷 Costa Rica</option>
+          <option value="Croatia">🇭🇷 Croatia</option>
+          <option value="Cuba">🇨🇺 Cuba</option>
+          <option value="Cyprus">🇨🇾 Cyprus</option>
+          <option value="Czech Republic">🇨🇿 Czech Republic</option>
+          <option value="Denmark">🇩🇰 Denmark</option>
+          <option value="Dominican Republic">🇩🇴 Dominican Republic</option>
+          <option value="Ecuador">🇪🇨 Ecuador</option>
+          <option value="Egypt">🇪🇬 Egypt</option>
+          <option value="El Salvador">🇸🇻 El Salvador</option>
+          <option value="Estonia">🇪🇪 Estonia</option>
+          <option value="Ethiopia">🇪🇹 Ethiopia</option>
+          <option value="Fiji">🇫🇯 Fiji</option>
+          <option value="Finland">🇫🇮 Finland</option>
+          <option value="France">🇫🇷 France</option>
+          <option value="Germany">🇩🇪 Germany</option>
+          <option value="Ghana">🇬🇭 Ghana</option>
+          <option value="Greece">🇬🇷 Greece</option>
+          <option value="Guatemala">🇬🇹 Guatemala</option>
+          <option value="Haiti">🇭🇹 Haiti</option>
+          <option value="Honduras">🇭🇳 Honduras</option>
+          <option value="Hungary">🇭🇺 Hungary</option>
+          <option value="Iceland">🇮🇸 Iceland</option>
+          <option value="India">🇮🇳 India</option>
+          <option value="Indonesia">🇮🇩 Indonesia</option>
+          <option value="Iran">🇮🇷 Iran</option>
+          <option value="Iraq">🇮🇶 Iraq</option>
+          <option value="Ireland">🇮🇪 Ireland</option>
+          <option value="Israel">🇮🇱 Israel</option>
+          <option value="Italy">🇮🇹 Italy</option>
+          <option value="Jamaica">🇯🇲 Jamaica</option>
+          <option value="Japan">🇯🇵 Japan</option>
+          <option value="Jordan">🇯🇴 Jordan</option>
+          <option value="Kenya">🇰🇪 Kenya</option>
+          <option value="Kuwait">🇰🇼 Kuwait</option>
+          <option value="Latvia">🇱🇻 Latvia</option>
+          <option value="Lebanon">🇱🇧 Lebanon</option>
+          <option value="Liberia">🇱🇷 Liberia</option>
+          <option value="Libya">🇱🇾 Libya</option>
+          <option value="Lithuania">🇱🇹 Lithuania</option>
+          <option value="Luxembourg">🇱🇺 Luxembourg</option>
+          <option value="Madagascar">🇲🇬 Madagascar</option>
+          <option value="Malawi">🇲🇼 Malawi</option>
+          <option value="Malaysia">🇲🇾 Malaysia</option>
+          <option value="Maldives">🇲🇻 Maldives</option>
+          <option value="Mali">🇲🇱 Mali</option>
+          <option value="Malta">🇲🇹 Malta</option>
+          <option value="Mexico">🇲🇽 Mexico</option>
+          <option value="Moldova">🇲🇩 Moldova</option>
+          <option value="Monaco">🇲🇨 Monaco</option>
+          <option value="Mongolia">🇲🇳 Mongolia</option>
+          <option value="Montenegro">🇲🇪 Montenegro</option>
+          <option value="Morocco">🇲🇦 Morocco</option>
+          <option value="Mozambique">🇲🇿 Mozambique</option>
+          <option value="Namibia">🇳🇦 Namibia</option>
+          <option value="Nepal">🇳🇵 Nepal</option>
+          <option value="Netherlands">🇳🇱 Netherlands</option>
+          <option value="New Zealand">🇳🇿 New Zealand</option>
+          <option value="Nicaragua">🇳🇮 Nicaragua</option>
+          <option value="Niger">🇳🇪 Niger</option>
+          <option value="Nigeria">🇳🇬 Nigeria</option>
+          <option value="North Korea">🇰🇵 North Korea</option>
+          <option value="North Macedonia">🇲🇰 North Macedonia</option>
+          <option value="Norway">🇳🇴 Norway</option>
+          <option value="Oman">🇴🇲 Oman</option>
+          <option value="Pakistan">🇵🇰 Pakistan</option>
+          <option value="Panama">🇵🇦 Panama</option>
+          <option value="Papua New Guinea">🇵🇬 Papua New Guinea</option>
+          <option value="Paraguay">🇵🇾 Paraguay</option>
+          <option value="Peru">🇵🇪 Peru</option>
+          <option value="Philippines">🇵🇭 Philippines</option>
+          <option value="Poland">🇵🇱 Poland</option>
+          <option value="Portugal">🇵🇹 Portugal</option>
+          <option value="Qatar">🇶🇦 Qatar</option>
+          <option value="Romania">🇷🇴 Romania</option>
+          <option value="Russia">🇷🇺 Russia</option>
+          <option value="Rwanda">🇷🇼 Rwanda</option>
+          <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+          <option value="Senegal">🇸🇳 Senegal</option>
+          <option value="Serbia">🇷🇸 Serbia</option>
+          <option value="Seychelles">🇸🇨 Seychelles</option>
+          <option value="Sierra Leone">🇸🇱 Sierra Leone</option>
+          <option value="Singapore">🇸🇬 Singapore</option>
+          <option value="Slovakia">🇸🇰 Slovakia</option>
+          <option value="Slovenia">🇸🇮 Slovenia</option>
+          <option value="Somalia">🇸🇴 Somalia</option>
+          <option value="South Africa">🇿🇦 South Africa</option>
+          <option value="South Korea">🇰🇷 South Korea</option>
+          <option value="South Sudan">🇸🇸 South Sudan</option>
+          <option value="Spain">🇪🇸 Spain</option>
+          <option value="Sri Lanka">🇱🇰 Sri Lanka</option>
+          <option value="Sudan">🇸🇩 Sudan</option>
+          <option value="Sweden">🇸🇪 Sweden</option>
+          <option value="Switzerland">🇨🇭 Switzerland</option>
+          <option value="Syria">🇸🇾 Syria</option>
+          <option value="Taiwan">🇹🇼 Taiwan</option>
+          <option value="Tanzania">🇹🇿 Tanzania</option>
+          <option value="Thailand">🇹🇭 Thailand</option>
+          <option value="Togo">🇹🇬 Togo</option>
+          <option value="Trinidad and Tobago">🇹🇹 Trinidad and Tobago</option>
+          <option value="Tunisia">🇹🇳 Tunisia</option>
+          <option value="Turkey">🇹🇷 Turkey</option>
+          <option value="Uganda">🇺🇬 Uganda</option>
+          <option value="Ukraine">🇺🇦 Ukraine</option>
+          <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+          <option value="United Kingdom">🇬🇧 United Kingdom</option>
+          <option value="United States">🇺🇸 United States</option>
+          <option value="Uruguay">🇺🇾 Uruguay</option>
+          <option value="Uzbekistan">🇺🇿 Uzbekistan</option>
+          <option value="Venezuela">🇻🇪 Venezuela</option>
+          <option value="Vietnam">🇻🇳 Vietnam</option>
+          <option value="Yemen">🇾🇪 Yemen</option>
+          <option value="Zambia">🇿🇲 Zambia</option>
+          <option value="Zimbabwe">🇿🇼 Zimbabwe</option>
+        </select>
+      </div>
+
+      <!-- Gender -->
+      <div class="select-field">
+        <label>Gender</label>
+        <select class="native-select">
+          <option value="">Select gender…</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+
+      <a href="#"><button class="btn-primary" type="submit">Create Account</button></a>
+    </form>
+
+    <p>Already have an account? <a href="Login.html">Sign in</a></p>
+  </div>
+
+  <script>
+    // Stars
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = Math.random() * 2.2 + 0.8;
+      s.style.cssText = `
+        width:${size}px; height:${size}px;
+        top:${Math.random()*55}%;
+        left:${Math.random()*100}%;
+        animation-duration:${2.5+Math.random()*4}s;
+        animation-delay:${-Math.random()*6}s;
+      `;
+      starsEl.appendChild(s);
+    }
+
+    // Select2
+    $(document).ready(function() {
+      $('#nationality').select2({
+        placeholder: 'Select your nationality…',
+        allowClear: true
+      });
+    });
+  </script>
+</body>
+</html>
